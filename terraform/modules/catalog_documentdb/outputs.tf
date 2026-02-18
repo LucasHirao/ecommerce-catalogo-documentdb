@@ -1,24 +1,25 @@
 output "documentdb_cluster_endpoint" {
   description = "Endpoint do cluster DocumentDB (catálogo)."
-  value       = module.catalog_documentdb.documentdb_cluster_endpoint
+  value       = aws_docdb_cluster.catalogo.endpoint
 }
 
 output "documentdb_cluster_reader_endpoint" {
   description = "Endpoint de leitura (replicas)."
-  value       = module.catalog_documentdb.documentdb_cluster_reader_endpoint
+  value       = aws_docdb_cluster.catalogo.reader_endpoint
 }
 
 output "documentdb_port" {
   description = "Porta do DocumentDB."
-  value       = module.catalog_documentdb.documentdb_port
+  value       = aws_docdb_cluster.catalogo.port
 }
 
 output "vpc_id" {
   description = "ID da VPC (existente ou criada)."
-  value       = module.catalog_documentdb.vpc_id
+  value       = local.vpc_id_in_use
 }
 
 output "documentdb_security_group_id" {
   description = "ID do security group do DocumentDB."
-  value       = module.catalog_documentdb.documentdb_security_group_id
+  value       = aws_security_group.documentdb.id
 }
+

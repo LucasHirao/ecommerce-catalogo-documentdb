@@ -4,11 +4,11 @@ Infraestrutura e pipeline CI/CD para o **catálogo** do projeto e-commerce, usan
 
 ## Conteúdo do repositório
 
-| Caminho | Descrição |
-|--------|-----------|
-| `terraform/` | Infraestrutura como código (VPC, DocumentDB, security groups) |
-| `.github/workflows/` | Pipeline CI/CD (GitHub Actions) |
-| `docs/` | Documentação do fluxo (Git Flow, deploy) |
+| Caminho              | Descrição                                                     |
+| -------------------- | ------------------------------------------------------------- |
+| `terraform/`         | Infraestrutura como código (VPC, DocumentDB, security groups) |
+| `.github/workflows/` | Pipeline CI/CD (GitHub Actions)                               |
+| `docs/`              | Documentação do fluxo (Git Flow, deploy)                      |
 
 ## Pré-requisitos
 
@@ -28,13 +28,13 @@ Infraestrutura e pipeline CI/CD para o **catálogo** do projeto e-commerce, usan
 
 Configure em **Settings → Secrets and variables → Actions**:
 
-| Secret | Descrição |
-|--------|-----------|
-| `AWS_ACCESS_KEY_ID` | Access key da conta AWS (sandbox ou não) |
-| `AWS_SECRET_ACCESS_KEY` | Secret key |
-| `AWS_REGION` | Região (ex.: `us-east-1`) |
-| `DOCUMENTDB_USERNAME` | Usuário master do DocumentDB |
-| `DOCUMENTDB_PASSWORD` | Senha master do DocumentDB |
+| Secret                  | Descrição                                                                                                                               |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `AWS_ACCESS_KEY_ID`     | Access key da conta AWS (sandbox ou não)                                                                                                |
+| `AWS_SECRET_ACCESS_KEY` | Secret key                                                                                                                              |
+| `AWS_REGION`            | Região (ex.: `us-east-1`)                                                                                                               |
+| `DOCUMENTDB_USERNAME`   | Usuário master do DocumentDB |
+| `DOCUMENTDB_PASSWORD`   | Senha master do DocumentDB   |
 
 Em conta **sandbox**, atualize esses secrets sempre que for fazer um deploy.
 

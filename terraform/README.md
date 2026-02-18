@@ -9,6 +9,8 @@ Infraestrutura como código para o cluster **Amazon DocumentDB** do projeto de c
 - Security group restrito à VPC
 - Parâmetro `tls = enabled` no cluster
 
+A infraestrutura está organizada no módulo `modules/catalog_documentdb`.
+
 ## Pré-requisitos
 
 - [Terraform](https://www.terraform.io/downloads) >= 1.5
@@ -27,38 +29,16 @@ terraform plan -out=tfplan
 terraform apply tfplan
 ```
 
-O state fica local por padrão (adequado para sandbox).
+O state fica **local** por padrão (adequado para sandbox).
 
 ## Uso em CI/CD
 
 O deploy é feito pelo GitHub Actions usando secrets:
 
 - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`
-- `DOCUMENTDB_USERNAME`, `DOCUMENTDB_PASSWORD` (ou `TF_VAR_documentdb_username` / `TF_VAR_documentdb_password`)
+- `DOCUMENTDB_USERNAME`, `DOCUMENTDB_PASSWORD`
 
 Em conta sandbox, atualize os secrets no repositório antes de rodar o workflow de deploy.
-
-## Backend remoto (opcional)
-
-Para state em S3 e lock com DynamoDB (recomendado em ambientes não sandbox):
-
-1. Crie um bucket S3 e uma tabela DynamoDB para lock.
-2. Crie um arquivo `backend.tf` ou use `-backend-config`:
-
-```hcl
-# backend.tf
-terraform {
-  backend "s3" {
-    bucket         = "SEU_BUCKET"
-    key            = "catalogo-documentdb/terraform.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "terraform-state-lock"
-    encrypt        = true
-  }
-}
-```
-
-Depois: `terraform init -reconfigure`.
 
 ## Variáveis principais
 
@@ -67,10 +47,23 @@ Depois: `terraform init -reconfigure`.
 | `aws_region` | Região AWS | `us-east-1` |
 | `environment` | Ambiente (sandbox, dev, prod) | `sandbox` |
 | `project_name` | Prefixo dos recursos | `ecommerce-catalogo` |
+| **`use_existing_vpc`** | Se `true`, usa VPC e subnets já existentes na conta | `false` |
+| **`vpc_id`** | ID da VPC existente (obrigatório se `use_existing_vpc = true`) | `""` |
+| **`subnet_ids`** | IDs das subnets existentes (mín. 2 em AZs diferentes). Vazio = todas as subnets da VPC | `[]` |
+| `vpc_cidr` | CIDR da VPC (só quando `use_existing_vpc = false`) | `10.0.0.0/16` |
 | `documentdb_instance_class` | Classe da instância | `docdb.t3.medium` |
 | `documentdb_cluster_size` | Número de instâncias | `1` |
 | `documentdb_username` | Usuário master | (obrigatório) |
 | `documentdb_password` | Senha master | (obrigatório) |
+
+### Usar VPC existente na sandbox
+
+1. No console AWS (ou CLI), anote o **ID da VPC** e os **IDs de pelo menos 2 subnets** em AZs diferentes (DocumentDB exige isso).
+2. Defina no `terraform.tfvars` ou em variáveis de ambiente:
+   - `use_existing_vpc = true`
+   - `vpc_id = "vpc-xxxxxxxx"`
+   - `subnet_ids = ["subnet-aaa", "subnet-bbb"]`  
+   Se `subnet_ids` for omitido ou `[]`, o Terraform usa **todas as subnets** da VPC informada (descoberta automática).
 
 ## Outputs
 

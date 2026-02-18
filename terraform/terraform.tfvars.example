@@ -1,12 +1,20 @@
 # Copie para terraform.tfvars e preencha (terraform.tfvars não deve ser commitado).
-# Em CI/CD use variáveis de ambiente TF_VAR_documentdb_username e TF_VAR_documentdb_password.
+# Em CI/CD use variáveis de ambiente TF_VAR_* (incl. documentdb_username e documentdb_password).
 
-aws_region       = "us-east-1"
-environment      = "sandbox"
-project_name     = "ecommerce-catalogo"
-vpc_cidr         = "10.0.0.0/16"
-documentdb_instance_class = "docdb.t3.medium"
-documentdb_cluster_size    = 1
+aws_region                  = "us-east-1"
+environment                 = "sandbox"
+project_name                = "ecommerce-catalogo"
+documentdb_instance_class   = "docdb.t3.medium"
+documentdb_cluster_size     = 1
+
+# --- Opção 1: Usar VPC e subnets já existentes na conta (ex.: sandbox) ---
+use_existing_vpc = true
+vpc_id           = "vpc-xxxxxxxxx"  # ID da VPC existente
+subnet_ids       = ["subnet-aaaa", "subnet-bbbb"]  # Mín. 2 subnets em AZs diferentes (ou deixe [] para usar todas as subnets da VPC)
+
+# --- Opção 2: Criar nova VPC (use_existing_vpc = false) ---
+# use_existing_vpc = false
+# vpc_cidr         = "10.0.0.0/16"
 
 # Credenciais: use TF_VAR_documentdb_username e TF_VAR_documentdb_password
 # ou defina em terraform.tfvars (local apenas).
