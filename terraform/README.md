@@ -8,6 +8,8 @@ Infraestrutura como código para o cluster **Amazon DocumentDB** do projeto de c
 - Cluster DocumentDB (compatível MongoDB) com criptografia e TLS
 - Security group restrito à VPC
 - Parâmetro `tls = enabled` no cluster
+- **Parameter Store (SSM)**: endpoint, porta e usuário do DocumentDB (para injeção em ECS)
+- **Secrets Manager**: senha master do DocumentDB (para rotação e injeção em ECS)
 
 A infraestrutura está organizada no módulo `modules/catalog_documentdb`.
 
@@ -71,3 +73,16 @@ Em conta sandbox, atualize os secrets no repositório antes de rodar o workflow 
 - `documentdb_cluster_reader_endpoint` – endpoint de leitura
 - `documentdb_port` – porta (27017)
 - `vpc_id`, `documentdb_security_group_id`
+- **`ssm_parameter_endpoint`**, **`ssm_parameter_port`**, **`ssm_parameter_username`** – nomes dos parâmetros SSM para ECS (`valueFrom` na task definition)
+- **`secretsmanager_password_arn`** – ARN do secret da senha no Secrets Manager (para ECS e rotação de senha)
+
+### Injeção em ECS
+
+Na task definition do ECS, use `secrets` com `valueFrom` apontando para:
+
+- **Endpoint**: `arn:aws:ssm:REGION:ACCOUNT:parameter/catalogo/documentdb/ENVIRONMENT/endpoint`
+- **Porta**: `arn:aws:ssm:REGION:ACCOUNT:parameter/catalogo/documentdb/ENVIRONMENT/port`
+- **Usuário**: `arn:aws:ssm:REGION:ACCOUNT:parameter/catalogo/documentdb/ENVIRONMENT/username`
+- **Senha**: ARN do secret (output `secretsmanager_password_arn`)
+
+A senha fica no Secrets Manager para permitir **rotação** sem alterar o Terraform; após rotacionar, atualize o valor do secret no console ou via CLI.

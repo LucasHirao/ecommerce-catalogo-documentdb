@@ -22,3 +22,24 @@ output "documentdb_security_group_id" {
   description = "ID do security group do DocumentDB."
   value       = module.catalog_documentdb.documentdb_security_group_id
 }
+
+# Parameter Store e Secrets Manager (para injeção em ECS)
+output "ssm_parameter_endpoint" {
+  description = "Nome do parâmetro SSM com o endpoint do DocumentDB (para ECS)."
+  value       = module.catalog_documentdb.ssm_parameter_endpoint
+}
+
+output "ssm_parameter_port" {
+  description = "Nome do parâmetro SSM com a porta do DocumentDB (para ECS)."
+  value       = module.catalog_documentdb.ssm_parameter_port
+}
+
+output "ssm_parameter_username" {
+  description = "Nome do parâmetro SSM com o usuário master (para ECS)."
+  value       = module.catalog_documentdb.ssm_parameter_username
+}
+
+output "secretsmanager_password_arn" {
+  description = "ARN do secret no Secrets Manager com a senha master (para ECS e rotação)."
+  value       = module.catalog_documentdb.secretsmanager_password_arn
+}

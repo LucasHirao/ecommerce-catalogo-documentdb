@@ -23,3 +23,24 @@ output "documentdb_security_group_id" {
   value       = aws_security_group.documentdb.id
 }
 
+# Parameter Store e Secrets Manager (para injeção em ECS)
+output "ssm_parameter_endpoint" {
+  description = "Nome do parâmetro SSM com o endpoint do DocumentDB (para ECS)."
+  value       = aws_ssm_parameter.documentdb_endpoint.name
+}
+
+output "ssm_parameter_port" {
+  description = "Nome do parâmetro SSM com a porta do DocumentDB (para ECS)."
+  value       = aws_ssm_parameter.documentdb_port.name
+}
+
+output "ssm_parameter_username" {
+  description = "Nome do parâmetro SSM com o usuário master (para ECS)."
+  value       = aws_ssm_parameter.documentdb_username.name
+}
+
+output "secretsmanager_password_arn" {
+  description = "ARN do secret no Secrets Manager com a senha master (para ECS e rotação)."
+  value       = aws_secretsmanager_secret.documentdb_password.arn
+}
+

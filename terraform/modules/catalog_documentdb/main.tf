@@ -142,3 +142,53 @@ resource "aws_docdb_cluster_instance" "catalogo" {
   })
 }
 
+# -----------------------------------------------------------------------------
+# Parameter Store (SSM): endpoint e usuário para injeção em ECS
+# -----------------------------------------------------------------------------
+locals {
+  ssm_prefix = "/catalogo/documentdb/${var.environment}"
+}
+
+resource "aws_ssm_parameter" "documentdb_endpoint" {
+  name        = "${local.ssm_prefix}/endpoint"
+  description = "Endpoint do cluster DocumentDB (catálogo) para ECS"
+  type        = "String"
+  value       = aws_docdb_cluster.catalogo.endpoint
+
+  tags = local.common_tags
+}
+
+resource "aws_ssm_parameter" "documentdb_port" {
+  name        = "${local.ssm_prefix}/port"
+  description = "Porta do DocumentDB para ECS"
+  type        = "String"
+  value       = tostring(aws_docdb_cluster.catalogo.port)
+
+  tags = local.common_tags
+}
+
+resource "aws_ssm_parameter" "documentdb_username" {
+  name        = "${local.ssm_prefix}/username"
+  description = "Usuário master do DocumentDB para ECS"
+  type        = "String"
+  value       = var.documentdb_username
+
+  tags = local.common_tags
+}
+
+# -----------------------------------------------------------------------------
+# Secrets Manager: senha master (para rotação e injeção em ECS)
+# -----------------------------------------------------------------------------
+resource "aws_secretsmanager_secret" "documentdb_password" {
+  name                    = "catalogo-documentdb-${var.environment}-master-password"
+  description             = "Senha master do DocumentDB (catálogo) – rotação via Secrets Manager"
+  recovery_window_in_days = 7
+
+  tags = local.common_tags
+}
+
+resource "aws_secretsmanager_secret_version" "documentdb_password" {
+  secret_id     = aws_secretsmanager_secret.documentdb_password.id
+  secret_string = var.documentdb_password
+}
+
