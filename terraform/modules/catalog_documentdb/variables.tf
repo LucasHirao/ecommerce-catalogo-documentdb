@@ -34,7 +34,7 @@ variable "vpc_cidr" {
 }
 
 variable "documentdb_instance_class" {
-  description = "Classe da instância DocumentDB (ex: docdb.t3.medium)."
+  description = "Classe da instância DocumentDB (ex: db.t3.medium)."
   type        = string
 }
 

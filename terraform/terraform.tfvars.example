@@ -4,7 +4,7 @@
 aws_region                = "us-east-1"
 environment               = "sandbox"
 project_name              = "ecommerce-catalogo"
-documentdb_instance_class = "docdb.t3.medium"
+documentdb_instance_class = "db.t3.medium"
 documentdb_cluster_size   = 1
 
 # --- Opção 1: Usar VPC e subnets já existentes na conta (ex.: sandbox) ---
