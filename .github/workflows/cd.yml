@@ -15,7 +15,7 @@ on:
           - dev
           - prod
   push:
-    branches: [main]
+    branches: [sandbox]
     paths:
       - 'terraform/**'
       - '.github/workflows/cd.yml'

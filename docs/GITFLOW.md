@@ -1,61 +1,39 @@
 # Git Flow – Catálogo DocumentDB
 
-Este repositório segue o [Git Flow](https://nvie.com/posts/a-successful-git-branching-model/): branches principais `main` e `develop`, e branches de apoio `feature/*`, `release/*` e `hotfix/*`.
+Este repositório usa um fluxo com branch **`sandbox`** para deploy: CI em qualquer branch e CD ao fazer merge em `sandbox`.
 
 ## Branches principais
 
 | Branch | Uso |
 |--------|-----|
-| **main** | Código em “produção”. Deploy (CD) é disparado ao alterar `terraform/**` ou manualmente. Deve estar estável. |
-| **develop** | Integração. Todo desenvolvimento é mergeado aqui primeiro. CI roda a cada push. |
+| **main** | Código em “produção”. |
+| **sandbox** | Branch de deploy para ambiente sandbox. **Merge aqui dispara o CD** (terraform apply). Deve existir no repo. |
+| **develop** | Integração. |
 
-## Branches de apoio
+## Fluxo com sandbox
 
-| Padrão | Uso | Origem | Destino do merge |
-|--------|-----|--------|-------------------|
-| **feature/\*** | Nova funcionalidade ou mudança de infra | `develop` | `develop` (via PR) |
-| **release/\*** | Preparação de release (versionamento, ajustes finos) | `develop` | `main` e `develop` |
-| **hotfix/\*** | Correção urgente em produção | `main` | `main` e `develop` |
+1. **Trabalhe em uma branch** (ex.: `feature/nome` a partir de `develop` ou `sandbox`).  
+   `git checkout -b feature/nome`
 
-## Fluxo resumido
+2. **Commit e push**  
+   A cada push, o **CI** roda (terraform fmt, init, validate) em qualquer branch.
 
-1. **Iniciar feature**  
-   A partir de `develop`:  
-   `git checkout develop && git pull && git checkout -b feature/nome-da-feature`
+3. **PR para sandbox**  
+   Ao final do CI (após push), o workflow **abre automaticamente um PR** da sua branch para `sandbox` (se ainda não existir). Você também pode abrir o PR manualmente.
 
-2. **Commitar e enviar**  
-   Trabalhe na feature, faça commit e push da branch.
+4. **Merge em `sandbox`**  
+   Aprove o PR e faça merge em `sandbox`. Isso **dispara o CD** (deploy na AWS em ambiente sandbox).
 
-3. **Abrir PR para `develop`**  
-   Abra Pull Request `feature/nome-da-feature` → `develop`. O CI (fmt + validate) deve passar.
-
-4. **Merge em `develop`**  
-   Após review, faça merge (squash ou merge commit, conforme padrão do repo).
-
-5. **Release**  
-   Quando for publicar uma versão:  
-   - Crie `release/x.y.z` a partir de `develop`.  
-   - Ajustes só de release nessa branch.  
-   - PR de `release/x.y.z` → `main`.  
-   - Após merge em `main`, merge de volta `release/x.y.z` em `develop` (e opcionalmente tag em `main`).
-
-6. **Hotfix**  
-   Para correção urgente em produção:  
-   - Crie `hotfix/descricao` a partir de `main`.  
-   - Corrija, faça PR para `main`.  
-   - Após merge em `main`, merge de volta em `develop`.
-
-7. **Deploy**  
-   - **Automático**: merge em `main` que altere `terraform/` ou o workflow CD.  
-   - **Manual**: GitHub Actions → workflow “CD” → Run workflow (escolha o ambiente). Em conta sandbox, garanta que os secrets da AWS e do DocumentDB estão atualizados antes.
+5. **Deploy manual**  
+   Quando precisar: GitHub Actions → workflow “CD” → Run workflow (escolha o ambiente). Em conta sandbox, garanta que os secrets da AWS e do DocumentDB estão atualizados antes.
 
 ## Configuração inicial (uma vez no repositório)
 
-Se o repositório ainda não tiver `develop`:
+Crie a branch **`sandbox`** (necessária para o CD e para os PRs automáticos do CI):
 
 ```bash
-git checkout -b develop
-git push -u origin develop
+git checkout -b sandbox
+git push -u origin sandbox
 ```
 
-Depois, proteja `main` (e opcionalmente `develop`) em **Settings → Branches** (branch protection rules), exigindo PR e status do CI para merge em `main`.
+Opcional: crie `develop` se ainda não existir e proteja `main` e `sandbox` em **Settings → Branches** (branch protection rules), exigindo PR e status do CI para merge.
