@@ -72,7 +72,7 @@ resource "aws_db_subnet_group" "documentdb" {
 
 resource "aws_security_group" "documentdb" {
   name_prefix = "${local.name_prefix}-documentdb-"
-  description = "Security group para cluster DocumentDB (catálogo)"
+  description = "Security group para cluster DocumentDB de catálogo"
   vpc_id      = local.vpc_id_in_use
 
   ingress {
