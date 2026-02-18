@@ -1,0 +1,14 @@
+# Copie para terraform.tfvars e preencha (terraform.tfvars não deve ser commitado).
+# Em CI/CD use variáveis de ambiente TF_VAR_documentdb_username e TF_VAR_documentdb_password.
+
+aws_region       = "us-east-1"
+environment      = "sandbox"
+project_name     = "ecommerce-catalogo"
+vpc_cidr         = "10.0.0.0/16"
+documentdb_instance_class = "docdb.t3.medium"
+documentdb_cluster_size    = 1
+
+# Credenciais: use TF_VAR_documentdb_username e TF_VAR_documentdb_password
+# ou defina em terraform.tfvars (local apenas).
+# documentdb_username = "admin"
+# documentdb_password = "SUA_SENHA_SEGURA"
