@@ -4,8 +4,9 @@ name: CI
 
 on:
   push:
+    branches: [feature/**]
   pull_request:
-    branches: [sandbox]
+    branches: [feature/**]
 
 env:
   TF_WORKING_DIR: terraform

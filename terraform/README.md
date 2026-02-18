@@ -42,6 +42,13 @@ O deploy é feito pelo GitHub Actions usando secrets:
 
 Em conta sandbox, atualize os secrets no repositório antes de rodar o workflow de deploy.
 
+### Erro "already exists" no CD
+
+O CD usa **state local** (cada run começa com state vazio). Se um run anterior criou recursos e falhou depois, ou se você re-executou o workflow, o Terraform tenta criar de novo e a AWS retorna "already exists". Para evitar isso:
+
+1. **Recomendado**: configure **backend S3** para o state (crie um bucket, adicione os secrets `TF_STATE_BUCKET` e `TF_STATE_KEY` no workflow e um step de init com `-backend-config`). Assim o state persiste entre runs.
+2. **Alternativa**: importe os recursos já existentes para o state (rode `terraform import` localmente com state inicializado) ou apague os recursos na AWS e rode o CD de novo (destrutivo).
+
 ## Variáveis principais
 
 | Variável                    | Descrição                                                                              | Default              |
