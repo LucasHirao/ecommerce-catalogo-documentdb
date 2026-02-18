@@ -43,7 +43,7 @@ variable "vpc_cidr" {
 variable "documentdb_instance_class" {
   description = "Classe da instância DocumentDB (ex: docdb.t3.medium)."
   type        = string
-  default     = "docdb.t3.medium"
+  default     = "db.t3.medium"
 }
 
 variable "documentdb_cluster_size" {
