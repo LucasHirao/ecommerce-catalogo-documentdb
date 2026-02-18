@@ -17,12 +17,15 @@ Infraestrutura e pipeline CI/CD para o **catálogo** do projeto e-commerce, usan
 
 ## Pipeline CI/CD (GitHub Actions)
 
-- **CI** (`ci.yml`): em todo **push** em `develop` e em **pull requests** para `develop`/`main`  
-  - `terraform fmt -check`, `terraform init`, `terraform validate`.
+- **CI** (`ci.yml`): em todo **push** em qualquer branch e em **pull requests** para `sandbox`.  
+  - `terraform fmt -check`, `terraform init`, `terraform validate`.  
+  - Ao final do CI (em push), abre automaticamente um **PR da sua branch para `sandbox`** (se ainda não existir). Aprove e faça merge para disparar o deploy.
 
 - **CD** (`cd.yml`):  
-  - **Deploy manual**: Actions → CD → “Run workflow” (escolha o ambiente: sandbox/dev/prod).  
-  - **Deploy automático**: push/merge em `main` que altere `terraform/**` ou o próprio workflow CD.
+  - **Deploy automático**: ao fazer **merge na branch `sandbox`** (alterações em `terraform/**` ou no workflow CD).  
+  - **Deploy manual**: Actions → CD → “Run workflow” (escolha o ambiente: sandbox/dev/prod).
+
+A branch **`sandbox`** deve existir no repositório (crie uma vez a partir de `main` ou `develop` e faça push).
 
 ### Secrets necessários no repositório
 
@@ -52,20 +55,20 @@ Detalhes e variáveis: [terraform/README.md](terraform/README.md).
 
 ## Git Flow
 
-O repositório segue **Git Flow**:
+O repositório segue **Git Flow** com branch **`sandbox`** para deploy em ambiente sandbox:
 
-- **`main`** – produção (deploys via CD para o ambiente escolhido).
-- **`develop`** – integração; CI roda a cada push.
-- **`feature/*`** – novas funcionalidades a partir de `develop`; merge em `develop` via PR.
-- **`release/*`** – preparação de release a partir de `develop`; merge em `main` e em `develop`.
-- **`hotfix/*`** – correções urgentes a partir de `main`; merge em `main` e em `develop`.
+- **`main`** – produção.
+- **`sandbox`** – branch de deploy para ambiente sandbox; **merge aqui dispara o CD** (terraform apply).
+- **`develop`** – integração.
+- **`feature/*`** – trabalho diário; CI roda a cada push; ao final o CI abre um PR para `sandbox`.
 
 Fluxo resumido:
 
-1. Trabalho diário em `feature/nome` a partir de `develop`.
-2. PR de `feature/nome` → `develop` (CI deve passar).
-3. Quando for release: branch `release/x.y` a partir de `develop`; após testes, PR para `main` e merge de volta em `develop`.
-4. Deploy: merge em `main` ou execução manual do workflow CD.
+1. Trabalhe em `feature/nome` (a partir de `develop` ou `sandbox`).
+2. Commit e push → **CI roda** (fmt, validate).
+3. O CI **abre um PR** da sua branch para `sandbox` (se ainda não existir).
+4. Aprove o PR e faça **merge em `sandbox`** → **CD roda** (deploy na AWS).
+5. Deploy manual: Actions → CD → Run workflow (quando precisar).
 
 Ver [docs/GITFLOW.md](docs/GITFLOW.md) para detalhes e comandos.
 
