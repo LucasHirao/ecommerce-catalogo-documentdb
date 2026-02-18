@@ -72,7 +72,7 @@ resource "aws_db_subnet_group" "documentdb" {
 
 resource "aws_security_group" "documentdb" {
   name_prefix = "${local.name_prefix}-documentdb-"
-  description = "Security group para cluster DocumentDB de catálogo"
+  description = "Security group for DocumentDB cluster (catalog)"
   vpc_id      = local.vpc_id_in_use
 
   ingress {
@@ -105,6 +105,7 @@ resource "aws_security_group" "documentdb" {
 resource "aws_docdb_cluster" "catalogo" {
   cluster_identifier              = "${local.name_prefix}-cluster"
   engine                          = "docdb"
+  engine_version                  = "5.0.0"
   master_username                 = var.documentdb_username
   master_password                 = var.documentdb_password
   db_subnet_group_name            = aws_db_subnet_group.documentdb.name
@@ -151,27 +152,30 @@ locals {
 
 resource "aws_ssm_parameter" "documentdb_endpoint" {
   name        = "${local.ssm_prefix}/endpoint"
-  description = "Endpoint do cluster DocumentDB (catálogo) para ECS"
+  description = "DocumentDB cluster endpoint for ECS"
   type        = "String"
   value       = aws_docdb_cluster.catalogo.endpoint
+  overwrite   = true
 
   tags = local.common_tags
 }
 
 resource "aws_ssm_parameter" "documentdb_port" {
   name        = "${local.ssm_prefix}/port"
-  description = "Porta do DocumentDB para ECS"
+  description = "DocumentDB port for ECS"
   type        = "String"
   value       = tostring(aws_docdb_cluster.catalogo.port)
+  overwrite   = true
 
   tags = local.common_tags
 }
 
 resource "aws_ssm_parameter" "documentdb_username" {
   name        = "${local.ssm_prefix}/username"
-  description = "Usuário master do DocumentDB para ECS"
+  description = "DocumentDB master username for ECS"
   type        = "String"
   value       = var.documentdb_username
+  overwrite   = true
 
   tags = local.common_tags
 }
@@ -181,7 +185,7 @@ resource "aws_ssm_parameter" "documentdb_username" {
 # -----------------------------------------------------------------------------
 resource "aws_secretsmanager_secret" "documentdb_password" {
   name                    = "catalogo-documentdb-${var.environment}-master-password"
-  description             = "Senha master do DocumentDB (catálogo) – rotação via Secrets Manager"
+  description             = "DocumentDB master password - rotation via Secrets Manager"
   recovery_window_in_days = 7
 
   tags = local.common_tags
