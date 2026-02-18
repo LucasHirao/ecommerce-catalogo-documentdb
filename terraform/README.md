@@ -44,19 +44,19 @@ Em conta sandbox, atualize os secrets no repositório antes de rodar o workflow 
 
 ## Variáveis principais
 
-| Variável | Descrição | Default |
-|----------|-----------|---------|
-| `aws_region` | Região AWS | `us-east-1` |
-| `environment` | Ambiente (sandbox, dev, prod) | `sandbox` |
-| `project_name` | Prefixo dos recursos | `ecommerce-catalogo` |
-| **`use_existing_vpc`** | Se `true`, usa VPC e subnets já existentes na conta | `false` |
-| **`vpc_id`** | ID da VPC existente (obrigatório se `use_existing_vpc = true`) | `""` |
-| **`subnet_ids`** | IDs das subnets existentes (mín. 2 em AZs diferentes). Vazio = todas as subnets da VPC | `[]` |
-| `vpc_cidr` | CIDR da VPC (só quando `use_existing_vpc = false`) | `10.0.0.0/16` |
-| `documentdb_instance_class` | Classe da instância | `docdb.t3.medium` |
-| `documentdb_cluster_size` | Número de instâncias | `1` |
-| `documentdb_username` | Usuário master | (obrigatório) |
-| `documentdb_password` | Senha master | (obrigatório) |
+| Variável                    | Descrição                                                                              | Default              |
+| --------------------------- | -------------------------------------------------------------------------------------- | -------------------- |
+| `aws_region`                | Região AWS                                                                             | `us-east-1`          |
+| `environment`               | Ambiente (sandbox, dev, prod)                                                          | `sandbox`            |
+| `project_name`              | Prefixo dos recursos                                                                   | `ecommerce-catalogo` |
+| **`use_existing_vpc`**      | Se `true`, usa VPC e subnets já existentes na conta                                    | `false`              |
+| **`vpc_id`**                | ID da VPC existente (obrigatório se `use_existing_vpc = true`)                         | `""`                 |
+| **`subnet_ids`**            | IDs das subnets existentes (mín. 2 em AZs diferentes). Vazio = todas as subnets da VPC | `[]`                 |
+| `vpc_cidr`                  | CIDR da VPC (só quando `use_existing_vpc = false`)                                     | `10.0.0.0/16`        |
+| `documentdb_instance_class` | Classe da instância                                                                    | `docdb.t3.medium`    |
+| `documentdb_cluster_size`   | Número de instâncias                                                                   | `1`                  |
+| `documentdb_username`       | Usuário master                                                                         | (obrigatório)        |
+| `documentdb_password`       | Senha master                                                                           | (obrigatório)        |
 
 ### Usar VPC existente na sandbox
 
