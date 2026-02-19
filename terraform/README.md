@@ -18,20 +18,31 @@ A infraestrutura está organizada no módulo `modules/catalog_documentdb`.
 - [Terraform](https://www.terraform.io/downloads) >= 1.5
 - Credenciais AWS configuradas (variáveis de ambiente ou `~/.aws/credentials`)
 
+## Backend S3 (state remoto)
+
+O state é gravado no bucket S3 do **ecommerce-infra-common** (mesma conta): `<account_id>-stage-terraform`, key `catalogo-documentdb/terraform.tfstate`.
+
+No **CI/CD**, o account ID é descoberto na execução com `aws sts get-caller-identity`; não é necessário secret para o nome do bucket. O workflow faz:
+
+```bash
+BUCKET="$(aws sts get-caller-identity --query Account --output text)-stage-terraform"
+terraform init -backend-config="bucket=$BUCKET"
+```
+
+Pré-requisito: o bucket deve existir na conta (deploy do ecommerce-infra-common).
+
 ## Uso local (sandbox)
 
 1. Configure credenciais AWS (ex.: `export AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`).
 2. Crie `terraform.tfvars` a partir de `terraform.tfvars.example` e defina `documentdb_username` e `documentdb_password` (ou use `TF_VAR_*`).
-3. Inicialize e aplique:
-
-```bash
-cd terraform
-terraform init
-terraform plan -out=tfplan
-terraform apply tfplan
-```
-
-O state fica **local** por padrão (adequado para sandbox).
+3. Inicialize (state remoto: bucket descoberto pela AWS CLI) e aplique:
+   ```bash
+   cd terraform
+   BUCKET="$(aws sts get-caller-identity --query Account --output text)-stage-terraform"
+   terraform init -backend-config="bucket=$BUCKET"
+   terraform plan -out=tfplan
+   terraform apply tfplan
+   ```
 
 ## Uso em CI/CD
 
@@ -42,12 +53,13 @@ O deploy é feito pelo GitHub Actions usando secrets:
 
 Em conta sandbox, atualize os secrets no repositório antes de rodar o workflow de deploy.
 
+### State no CI/CD
+
+O workflow descobre o account ID na execução e usa o bucket `<account_id>-stage-terraform` (ecommerce-infra-common). Nenhum secret adicional é necessário; o state persiste entre runs.
+
 ### Erro "already exists" no CD
 
-O CD usa **state local** (cada run começa com state vazio). Se um run anterior criou recursos e falhou depois, ou se você re-executou o workflow, o Terraform tenta criar de novo e a AWS retorna "already exists". Para evitar isso:
-
-1. **Recomendado**: configure **backend S3** para o state (crie um bucket, adicione os secrets `TF_STATE_BUCKET` e `TF_STATE_KEY` no workflow e um step de init com `-backend-config`). Assim o state persiste entre runs.
-2. **Alternativa**: importe os recursos já existentes para o state (rode `terraform import` localmente com state inicializado) ou apague os recursos na AWS e rode o CD de novo (destrutivo).
+Se o CD ainda usar state local e um run anterior criou recursos, o Terraform pode tentar criar de novo e a AWS retorna "already exists". Solução: use o backend S3 (acima) no workflow ou importe os recursos existentes / apague os recursos e rode o CD de novo (destrutivo).
 
 ## Variáveis principais
 
