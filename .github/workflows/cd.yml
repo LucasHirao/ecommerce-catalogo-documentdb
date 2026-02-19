@@ -46,7 +46,9 @@ jobs:
           terraform_wrapper: false
 
       - name: Terraform init
-        run: terraform init -input=false
+        run: |
+          BUCKET="$(aws sts get-caller-identity --query Account --output text)-stage-terraform"
+          terraform init -input=false -backend-config="bucket=$BUCKET"
         working-directory: ${{ env.TF_WORKING_DIR }}
 
       - name: Terraform plan
