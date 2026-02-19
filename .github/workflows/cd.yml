@@ -47,8 +47,15 @@ jobs:
 
       - name: Terraform init
         run: |
-          BUCKET="$(aws sts get-caller-identity --query Account --output text)-stage-terraform"
-          terraform init -input=false -backend-config="bucket=$BUCKET"
+          set -e
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          if [ -z "$ACCOUNT_ID" ]; then
+            echo "::error::Falha ao obter Account ID da AWS (aws sts get-caller-identity)"
+            exit 1
+          fi
+          BUCKET="${ACCOUNT_ID}-stage-terraform"
+          echo "bucket = \"$BUCKET\"" > backend.ci.hcl
+          terraform init -input=false -backend-config=backend.ci.hcl
         working-directory: ${{ env.TF_WORKING_DIR }}
 
       - name: Terraform plan
